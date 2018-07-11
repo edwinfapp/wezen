@@ -2,7 +2,7 @@ var $CONTROLES_ACTIVOS = true;
 
 var DIM_PISO = 1024;
 var DIM_NAVE = 4;
-var $ALTURA_NAVE = 2.8;
+var $ALTURA_NAVE = 3.5;
 
 var $w = null;
 
@@ -47,7 +47,7 @@ var CONTROL = {
 	p : false
 }
 
-var MAX_VELOCIDAD = 12;
+var MAX_VELOCIDAD = 20;
 
 var ltime = Date.now();
 
@@ -174,7 +174,7 @@ function exe() {
 		car.z -= deltha * 2;
 	}
 
-	if (car.z < -20) {
+	if (car.z < -25) {
 		car.z = $ALTURA_NAVE + 30;
 		car.x = 0;
 		car.y = 0;
@@ -209,9 +209,9 @@ var ws = null;
 
 function connect() {
 
-	// var URL = 'ws://127.0.0.1:8080/Wezen/srv';
+	var URL = 'ws://127.0.0.1:8080/Wezen/srv';
 
-	var URL = 'ws://18.222.128.125/Wezen/srv';
+	// var URL = 'ws://18.222.128.125/Wezen/srv';
 
 	if ('WebSocket' in window) {
 		ws = new WebSocket(URL);
@@ -310,7 +310,7 @@ function actualizarData(mdata) {
 			DATA.cr[DATA.me] = {
 				x : 0,
 				y : 0,
-				z : 2.8,
+				z : $ALTURA_NAVE,
 				v : 1,
 				r : 0,
 				i : 0
@@ -331,7 +331,7 @@ function actualizarData(mdata) {
 			DATA.cr[i] = {
 				x : 0,
 				y : 0,
-				z : 2.8,
+				z : $ALTURA_NAVE,
 				v : 1,
 				r : 0,
 				i : 0

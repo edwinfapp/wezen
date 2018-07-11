@@ -6,6 +6,8 @@ var IFCONTROL = $("#if_control").get(0).contentWindow;
 
 var VELOCIMETRO_HT = $("#vel_in");
 
+var PIXELRATIO = 0.8;
+
 // ---
 
 var AG = $("#area_game");
@@ -14,12 +16,12 @@ console.log(AG.width() + ", " + AG.height());
 
 var SCENE = new THREE.Scene();
 
-var CAMERA = new THREE.PerspectiveCamera(75, AG.width() / AG.height(), 0.1, 1000);
+var CAMERA = new THREE.PerspectiveCamera(75, AG.width() / AG.height(), 0.1, 2000);
 CAMERA.up = new THREE.Vector3(0, 0, 1);
 
 var RENDERER = new THREE.WebGLRenderer();
 RENDERER.setSize(AG.width(), AG.height());
-RENDERER.setPixelRatio(window.devicePixelRatio * 0.9);
+RENDERER.setPixelRatio(window.devicePixelRatio * PIXELRATIO);
 RENDERER.setClearColor(0x000000, 1);
 
 RENDERER.shadowMap.enabled = true;
@@ -31,29 +33,54 @@ AG.get(0).appendChild(RENDERER.domElement);
 
 // -----------------------------------------------------------
 
-// SCENE.add(new THREE.AmbientLight(0xCCCCCC));
+SCENE.add(new THREE.AmbientLight(0xCCCCCC));
+{
+	// SpotLight( color, intensity, distance, angle, penumbra, decay )
+	sunLight = new THREE.SpotLight(0xffffff, 0.8, 2000, 2, 0, 0);
+	sunLight.position.set(0, 0, 600);
+
+	sunLight.castShadow = true;
+
+	var ms = 512 * 2 * 2;
+	
+	sunLight.shadow.mapSize.width = ms;
+	sunLight.shadow.mapSize.height = ms;
+
+	sunLight.shadow.camera.castShadow = true;
+	sunLight.shadow.camera.near = 1;
+	sunLight.shadow.camera.far = 5000;
+	sunLight.shadow.camera.fov = 1;
+
+	SCENE.add(sunLight);
+}
+
 
 var spotLight = null;
 
 {
 	// SpotLight( color, intensity, distance, angle, penumbra, decay )
-	spotLight = new THREE.SpotLight(0xffffff, 4, 300, 4, 0.5, 1);
-	spotLight.position.set(0, 0, 30);
+	spotLight = new THREE.SpotLight(0xffffff, 0.9, 100, 2, 0, 0);
+	spotLight.position.set(0, 0, 20);
 
 	spotLight.castShadow = true;
 
-	spotLight.shadow.mapSize.width = 512;
-	spotLight.shadow.mapSize.height = 512;
+	var ms = 512;
+	
+	spotLight.shadow.mapSize.width = ms;
+	spotLight.shadow.mapSize.height = ms;
 
 	spotLight.shadow.camera.castShadow = true;
 	spotLight.shadow.camera.near = 1;
-	spotLight.shadow.camera.far = 4000;
+	spotLight.shadow.camera.far = 5000;
 	spotLight.shadow.camera.fov = 1;
 
 	SCENE.add(spotLight);
 }
 
 // SCENE.add(new THREE.SpotLightHelper(spotLight));
+
+SCENE.fog = new THREE.Fog(new THREE.Color(0x000000), 0.0025, 1200);
+
 
 // ----------------------------------------------
 
@@ -62,12 +89,12 @@ var DIM_PISO = 1024;
 var piso = null;
 
 {
-	var geometry = new THREE.BoxGeometry(DIM_PISO, DIM_PISO, 2);
+	var geometry = new THREE.BoxGeometry(DIM_PISO, DIM_PISO, 6);
 
 	var texture = new THREE.TextureLoader().load('images/car.png');
 
 	var ds = 6;
-	texture.repeat.set(574 / ds, 1000 / ds);
+	texture.repeat.set(1024 / ds, 1024 / ds);
 	texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 
 	var material = new THREE.MeshStandardMaterial({
@@ -77,12 +104,70 @@ var piso = null;
 
 	piso = new THREE.Mesh(geometry, material);
 
-	piso.position.z *= 1.1;
+	piso.position.z = -2;
 
 	piso.castShadow = true;
 	piso.receiveShadow = true;
 
 	SCENE.add(piso);
+}
+
+var lava = null;
+
+{
+	var geometry = new THREE.PlaneGeometry( DIM_PISO*2, DIM_PISO*2, 100, 100 ); //new THREE.BoxGeometry(DIM_PISO*2, DIM_PISO*2, 100);
+
+	var texture = new THREE.TextureLoader().load('images/lava.png');
+
+	geometry.vertices.forEach(function(v) {
+		v.z = Math.random() * 10;
+	});
+	
+	var ds = 6;
+	texture.repeat.set(1024 / ds, 1024 / ds);
+	texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+
+	var material = new THREE.MeshStandardMaterial({
+		map : texture,
+		color : 0xFFFFFF
+	});
+
+	lava = new THREE.Mesh(geometry, material);
+
+	lava.position.z = -20;
+
+	lava.castShadow = false;
+	lava.receiveShadow = true;
+
+	SCENE.add(lava);
+}
+
+{
+	SCENE.add(GEOSTATION);
+	
+	var ds = DIM_PISO / 2 + 50;
+
+	var t1 = GEOTOWER.clone();
+	var t2 = GEOTOWER.clone();
+	var t3 = GEOTOWER.clone();
+	var t4 = GEOTOWER.clone();
+	
+	t1.position.x = ds;
+	t1.position.y = ds;
+	
+	t2.position.x = -ds;
+	t2.position.y = ds;
+	
+	t3.position.x = -ds;
+	t3.position.y = -ds;
+	
+	t4.position.x = ds;
+	t4.position.y = -ds;
+	
+	SCENE.add(t1);
+	SCENE.add(t2);
+	SCENE.add(t3);
+	SCENE.add(t4);
 }
 
 // ---------------------------------------------------------------
@@ -180,6 +265,12 @@ function adicionarCarro(index) {
 		ff.position.y = 0;
 		ff.position.z = 0;
 
+		// --
+		
+		ff = new THREE.Object3D();
+		
+		ff.add(GEONAVE.clone());
+		
 		cube.add(ff);
 	}
 
@@ -233,12 +324,11 @@ var animate = function() {
 		CAMERA.lookAt(CAMERA_LOOKAT);
 	
 		spotLight.target.position.set(cube.position.x, cube.position.y, cube.position.z);
-	
+		
 		spotLight.target.updateMatrixWorld();
-	
+		
 		spotLight.position.x = cube.position.x;
 		spotLight.position.y = cube.position.y;
-		spotLight.position.z = 45;
 
 	}
 	
@@ -251,7 +341,7 @@ animate();
 
 $(window).resize(function() {
 	RENDERER.setSize(AG.width(), AG.height());
-	RENDERER.setPixelRatio(window.devicePixelRatio * 0.9);
+	RENDERER.setPixelRatio(window.devicePixelRatio * PIXELRATIO);
 	CAMERA.aspect = AG.width() / AG.height();
 	CAMERA.updateProjectionMatrix();
 	RENDERER.setSize(AG.width(), AG.height());
