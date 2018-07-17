@@ -12,7 +12,7 @@
 
 	<iframe id="if_control" onload="IREADY = true;" src="control.jsp"></iframe>
 
-	<div id="vel_in">0</div>
+	<pre id="vel_in"></pre>
 
 	<div id="area_game"></div>
 

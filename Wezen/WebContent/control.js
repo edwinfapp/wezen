@@ -1,3 +1,28 @@
+// inicia musica de fondo
+
+var $SOUND = new Howl({
+  src: ['sound/music.mp3'],
+  loop: true,
+  volume: 0.2
+});
+
+$SOUND.play();
+
+//-----------------------
+// inicia musica de fondo
+
+var $LASER = new Howl({
+  src: ['sound/laser.mp3'],
+  volume: 1
+});
+
+var $DIE_SOUND = new Howl({
+  src: ['sound/die.mp3'],
+  volume: 1
+});
+
+// -----------------------
+
 var $CONTROLES_ACTIVOS = true;
 
 var DIM_PISO = 1024;
@@ -86,13 +111,15 @@ function exe() {
 	// -- mira si disparo
 
 	if (CONTROL.p) {
+		
+		$LASER.play();
 
 		var bb = {
 			x : car.x,
 			y : car.y,
 			z : car.z,
 			r : car.r,
-			v : MAX_VELOCIDAD * 6
+			v : MAX_VELOCIDAD * 4
 		}
 
 		DATA.bl.push(bb);
@@ -108,14 +135,14 @@ function exe() {
 
 	for ( var d in DATA.bl) {
 		var e = DATA.bl[d];
-		e.v -= 0.04;
+		e.v -= 0.07;
 		e.y += deltha * e.v * Math.cos(-e.r);
 		e.x += deltha * e.v * Math.sin(-e.r);
 	}
 
 	// --
 
-	while (DATA.bl.length > 0 && DATA.bl[0].v < MAX_VELOCIDAD * 5.7) {
+	while (DATA.bl.length > 0 && DATA.bl[0].v < MAX_VELOCIDAD * 3.8) {
 		DATA.bl.shift();
 	}
 
@@ -174,20 +201,45 @@ function exe() {
 		car.z -= deltha * 2;
 	}
 
-	if (car.z < -25) {
+	
+	// si se cae se muere
+	if (car.e > 0 && car.z < -15) {
+		car.e = 0;
+		$CONTROLES_ACTIVOS = false;
+		$DIE_SOUND.play();
+	}
+	
+	if(car.e <= 0){
+		car.e -= deltha;
+		console.log(car.e);
+	}
+
+	// si esta muerto reinicia
+	if (car.e <= -10) {
+		car.e = 100;
 		car.z = $ALTURA_NAVE + 30;
 		car.x = 0;
 		car.y = 0;
 		car.v = 1;
+		car.c = 5;
 		$CONTROLES_ACTIVOS = true;
 	}
-
+	
 	if (car.z > $ALTURA_NAVE) {
 		car.z -= 0.2;
 		if (car.z < $ALTURA_NAVE) {
 			car.z = $ALTURA_NAVE;
 		}
 	}
+	
+	if(car.c > 0){
+		car.c -= deltha/10;
+		if(car.c < 0){
+			car.c = 0;
+		}
+	}
+	
+	// ------------------------------
 
 	var w = window.innerWidth;
 	var h = window.innerHeight;
@@ -196,6 +248,7 @@ function exe() {
 
 	$pcar.css("bottom", parseInt(w * (car.y + 512) / 1024 - wc) + "px");
 	$pcar.css("left", parseInt(h * (car.x + 512) / 1024 - wc) + "px");
+	$pcar.css("transform", "rotate(" + Math.round( -car.r * 180 / Math.PI) +"deg)");
 
 	if ($w) {
 		$w.postMessage(DATA, "*");
@@ -208,11 +261,15 @@ function exe() {
 var ws = null;
 
 function connect() {
+	
+	var URL = 'ws://edwinfapp.com/Wezen/srv';
 
-	var URL = 'ws://127.0.0.1:8080/Wezen/srv';
+	if(window.location.hostname == "127.0.0.1"){
+		URL = 'ws://127.0.0.1:8080/Wezen/srv';
+	}
 
-	// var URL = 'ws://18.222.128.125/Wezen/srv';
-
+	console.log("Server: " + URL);
+	
 	if ('WebSocket' in window) {
 		ws = new WebSocket(URL);
 	} else if ('MozWebSocket' in window) {
@@ -313,7 +370,10 @@ function actualizarData(mdata) {
 				z : $ALTURA_NAVE,
 				v : 1,
 				r : 0,
-				i : 0
+				i : 0,
+				e : 100,
+				c : 5,
+				p : 0
 			};
 		}
 
@@ -334,7 +394,10 @@ function actualizarData(mdata) {
 				z : $ALTURA_NAVE,
 				v : 1,
 				r : 0,
-				i : 0
+				i : 0,
+				e : 0,
+				c : 0,
+				p : 0
 			};
 
 		}
@@ -346,6 +409,9 @@ function actualizarData(mdata) {
 			v : mdata.cr[i].v,
 			r : mdata.cr[i].r,
 			i : mdata.cr[i].i,
+			c : mdata.cr[i].c,
+			p : mdata.cr[i].p,
+			e : mdata.cr[i].e,
 		};
 
 		var deltha = (PROMEDIOTIEMPO) / 80;

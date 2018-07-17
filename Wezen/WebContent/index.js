@@ -25,7 +25,8 @@ RENDERER.setPixelRatio(window.devicePixelRatio * PIXELRATIO);
 RENDERER.setClearColor(0x000000, 1);
 
 RENDERER.shadowMap.enabled = true;
-RENDERER.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+RENDERER.shadowMap.type = THREE.PCFSoftShadowMap; // default
+													// THREE.PCFShadowMap
 
 var CAMERA_LOOKAT = new THREE.Vector3(0, 0, 0);
 
@@ -115,7 +116,10 @@ var piso = null;
 var lava = null;
 
 {
-	var geometry = new THREE.PlaneGeometry( DIM_PISO*2, DIM_PISO*2, 100, 100 ); //new THREE.BoxGeometry(DIM_PISO*2, DIM_PISO*2, 100);
+	var geometry = new THREE.PlaneGeometry( DIM_PISO*2, DIM_PISO*2, 100, 100 ); // new
+																				// THREE.BoxGeometry(DIM_PISO*2,
+																				// DIM_PISO*2,
+																				// 100);
 
 	var texture = new THREE.TextureLoader().load('images/lava.png');
 
@@ -229,41 +233,13 @@ function adicionarCarro(index) {
 	var cube = new THREE.Object3D();
 
 	var ff = null;
+	var cf = null;
 
 	var angu = 0;
 
 	{
-
-		var geometry = new THREE.SphereGeometry(2, 4, 4);
-
-		var material = new THREE.MeshLambertMaterial({
-			color : 0x00FF00
-		});
-
-		ff = new THREE.Mesh(geometry, material);
-
-		geometry.vertices.forEach(function(v) {
-
-			v.z = v.z / 2;
-
-			if (v.y > 0) {
-				v.y = 2 - Math.abs(v.x);
-				v.z = v.z / 4;
-				v.y = v.y * 3;
-			}
-
-			v.x = v.x * 2;
-
-		});
-
-		ff.castShadow = true;
-		ff.receiveShadow = true;
-
-		ff.position.z = 1.5;
-
-		ff.position.x = 0;
-		ff.position.y = 0;
-		ff.position.z = 0;
+		// ff.castShadow = true;
+		// ff.receiveShadow = true;
 
 		// --
 		
@@ -272,6 +248,24 @@ function adicionarCarro(index) {
 		ff.add(GEONAVE.clone());
 		
 		cube.add(ff);
+		
+		// --
+		
+		var geometry = new THREE.SphereGeometry(6, 32, 32);
+
+		var texture = new THREE.TextureLoader().load('images/energia.jpg');
+		
+		var material = new THREE.MeshLambertMaterial({
+			map: texture,
+			opacity: 0.35,
+			transparent: true
+		});
+
+		cf = new THREE.Mesh(geometry, material);
+		cf.rotation.z += Math.PI / 2;
+
+		cube.add(cf);
+		
 	}
 
 	cube.position.z = 2;
@@ -280,7 +274,8 @@ function adicionarCarro(index) {
 
 	cars[index] = {
 		cube : cube,
-		ff : ff
+		ff : ff,
+		cf : cf
 	};
 
 }
@@ -308,6 +303,30 @@ var animate = function() {
 		var cube = cars[IDCAR].cube;
 		var angu = -cube.rotation.z;
 	
+		for(var IDS in cars){
+		
+			try {
+				
+				var ccar = cars[IDS];
+				
+				var cc = CDATA.cr[IDS].c;
+				
+				if(cc > 0){
+					ccar.cf.scale.set(1,1,1);
+					if(cc < 0.5){
+						ccar.cf.scale.set(cc * 2,cc * 2,cc * 2);
+					}
+					ccar.cf.rotation.z += 1;
+				}else{
+					ccar.cf.scale.set(0,0,0);
+				}	
+
+			} catch (e) {
+			}
+			
+		}
+		
+		
 		var dis = 6.5;
 		if (CDATA) {
 			dis = CDATA.cr[IDCAR].v / 2 + 6;
@@ -447,7 +466,9 @@ function receiveMessage(event) {
 	CDATA = data;
 
 	// ajusta la velocidad
-	VELOCIMETRO_HT.text(parseInt(data.cr[IDCAR].v * 100));
+	// VELOCIMETRO_HT.text(parseInt(data.cr[IDCAR].v * 100));
+	
+	VELOCIMETRO_HT.text(JSON.stringify(data.cr, null, 4));
 
 	// ajusta las posiciones de cada carro
 
@@ -469,6 +490,11 @@ function receiveMessage(event) {
 				car.cube.position.x = dt.x;
 				car.cube.position.y = dt.y;
 				car.cube.position.z = dt.z;
+				
+				CDATA.cr[index].p = data.cr[index].p;
+				CDATA.cr[index].c = data.cr[index].c;
+				CDATA.cr[index].e = data.cr[index].e;
+				
 				car.ff.rotation.y = dt.i;
 				car.cube.rotation.z = dt.r;
 			}

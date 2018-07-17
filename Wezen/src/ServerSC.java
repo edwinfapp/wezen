@@ -192,7 +192,14 @@ public class ServerSC {
 	}
 
 	public static class Info {
-		public double x = 0, y = 0, z = 2.8, v = 1, r = 0, i = 0;
+		public double x = 0, y = 0, z = 2.8, // ubicacion
+				v = 1, // velocidad
+				r = 0, // rotacion
+				i = 0, // inclinacion
+				e = 0, // energia
+				c = 0, // tiempo con campo de energia
+				p = 0 // puntaje
+		;
 	}
 
 }

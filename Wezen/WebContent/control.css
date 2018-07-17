@@ -11,8 +11,9 @@ html, body {
 #pcar {
 	display: block;
 	position: absolute;
-	width: 10px;
-	height: 10px;
-	background-color: red;
-	border-radius: 100%;
+	width: 20px;
+	height: 20px;
+	background-image: url("images/flecha.png");
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
 }

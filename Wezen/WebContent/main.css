@@ -22,10 +22,12 @@ canvas {
 	top: 20px;
 	left: 20px;
 	color: white;
-	background: transparent;
-	height: 100px;
-	width: 100px;
+	background: rgba(0,0,0,0.6);
+	height: 500px;
+	width: 250px;
 	z-index: 2;
+	overflow: auto;
+	font-size: 10px;
 }
 
 #area_game {
