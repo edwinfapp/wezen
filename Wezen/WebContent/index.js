@@ -234,13 +234,11 @@ function adicionarCarro(index) {
 
 	var ff = null;
 	var cf = null;
+	var df = null;
 
 	var angu = 0;
 
 	{
-		// ff.castShadow = true;
-		// ff.receiveShadow = true;
-
 		// --
 		
 		ff = new THREE.Object3D();
@@ -248,9 +246,10 @@ function adicionarCarro(index) {
 		ff.add(GEONAVE.clone());
 		
 		cube.add(ff);
-		
+	}
 		// --
-		
+	
+	{
 		var geometry = new THREE.SphereGeometry(6, 32, 32);
 
 		var texture = new THREE.TextureLoader().load('images/energia.jpg');
@@ -267,6 +266,26 @@ function adicionarCarro(index) {
 		cube.add(cf);
 		
 	}
+	
+	{
+		// --
+		
+		var geometry = new THREE.SphereGeometry(6, 32, 32);
+
+		var texture = new THREE.TextureLoader().load('images/fuego.jpg');
+		
+		var material = new THREE.MeshLambertMaterial({
+			map: texture,
+			opacity: 0.35,
+			transparent: true
+		});
+
+		df = new THREE.Mesh(geometry, material);
+		df.rotation.z += Math.PI / 2;
+
+		cube.add(df);
+		
+	}
 
 	cube.position.z = 2;
 
@@ -275,7 +294,8 @@ function adicionarCarro(index) {
 	cars[index] = {
 		cube : cube,
 		ff : ff,
-		cf : cf
+		cf : cf,
+		df : df
 	};
 
 }
@@ -310,16 +330,25 @@ var animate = function() {
 				var ccar = cars[IDS];
 				
 				var cc = CDATA.cr[IDS].c;
+				var ee = CDATA.cr[IDS].e;
 				
-				if(cc > 0){
+				ccar.df.scale.set(0,0,0);
+				ccar.cf.scale.set(0,0,0);
+
+				if(cc > 0 && ee > 0){
 					ccar.cf.scale.set(1,1,1);
 					if(cc < 0.5){
 						ccar.cf.scale.set(cc * 2,cc * 2,cc * 2);
 					}
 					ccar.cf.rotation.z += 1;
-				}else{
-					ccar.cf.scale.set(0,0,0);
-				}	
+				}
+				
+				if(cc > 0 && ee <= 0){
+					var sd = -ee;
+					if(sd> 2.5){ sd = 2.5; }
+					ccar.df.scale.set(sd * 2, sd * 2,sd * 2);
+					ccar.df.rotation.z += 1;
+				}
 
 			} catch (e) {
 			}
@@ -466,9 +495,9 @@ function receiveMessage(event) {
 	CDATA = data;
 
 	// ajusta la velocidad
-	// VELOCIMETRO_HT.text(parseInt(data.cr[IDCAR].v * 100));
+	VELOCIMETRO_HT.text(parseInt(data.cr[IDCAR].v * 100));
 	
-	VELOCIMETRO_HT.text(JSON.stringify(data.cr, null, 4));
+	// VELOCIMETRO_HT.text(JSON.stringify(data.cr, null, 4));
 
 	// ajusta las posiciones de cada carro
 

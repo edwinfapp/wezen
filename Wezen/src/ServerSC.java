@@ -122,9 +122,15 @@ public class ServerSC {
 			} catch (Exception e) {
 			}
 
-			String sdata = new Gson().toJson(data);
-
 			synchronized (session) {
+
+				String sdata = null;
+				while (sdata == null) {
+					try {
+						sdata = new Gson().toJson(data);
+					} catch (Exception e) {
+					}
+				}
 				// System.out.println("return:" + sdata);
 				session.getBasicRemote().sendText(sdata);
 			}

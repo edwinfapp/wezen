@@ -1,24 +1,35 @@
 // inicia musica de fondo
 
 var $SOUND = new Howl({
-  src: ['sound/music.mp3'],
-  loop: true,
-  volume: 0.2
+	src : [ 'sound/music.mp3' ],
+	loop : true,
+	volume : 0.2
 });
 
 $SOUND.play();
 
-//-----------------------
+// -----------------------
 // inicia musica de fondo
 
 var $LASER = new Howl({
-  src: ['sound/laser.mp3'],
-  volume: 1
+	src : [ 'sound/laser.mp3' ],
+	volume : 1
+});
+
+var $STAR = new Howl({
+	src : [ 'sound/star.mp3' ],
+	volume : 1
 });
 
 var $DIE_SOUND = new Howl({
-  src: ['sound/die.mp3'],
-  volume: 1
+	src : [ 'sound/die.mp3' ],
+	volume : 1
+});
+
+var $DANGER = new Howl({
+	src : [ 'sound/danger.mp3' ],
+	volume : 0.1,
+	loop : true
 });
 
 // -----------------------
@@ -28,6 +39,7 @@ var $CONTROLES_ACTIVOS = true;
 var DIM_PISO = 1024;
 var DIM_NAVE = 4;
 var $ALTURA_NAVE = 3.5;
+var $ENERGIA_DISPARO = 5;
 
 var $w = null;
 
@@ -72,7 +84,7 @@ var CONTROL = {
 	p : false
 }
 
-var MAX_VELOCIDAD = 20;
+var MAX_VELOCIDAD = 18;
 
 var ltime = Date.now();
 
@@ -111,7 +123,7 @@ function exe() {
 	// -- mira si disparo
 
 	if (CONTROL.p) {
-		
+
 		$LASER.play();
 
 		var bb = {
@@ -119,19 +131,21 @@ function exe() {
 			y : car.y,
 			z : car.z,
 			r : car.r,
-			v : MAX_VELOCIDAD * 4
+			v : MAX_VELOCIDAD * 4,
+			c : DATA.me,
+			a : true
 		}
 
 		DATA.bl.push(bb);
 
 		console.log("disparo");
 
-		sendMessage("DD" + JSON.stringify(bb));
+		sendMessage("DDD" + JSON.stringify(bb));
 
 		CONTROL.p = false;
 	}
 
-	// --
+	// -- Aumenta la posicion de las balas
 
 	for ( var d in DATA.bl) {
 		var e = DATA.bl[d];
@@ -140,13 +154,49 @@ function exe() {
 		e.x += deltha * e.v * Math.sin(-e.r);
 	}
 
-	// --
+	// -- si esta ya muy lejos la bala se elimina..!!
 
 	while (DATA.bl.length > 0 && DATA.bl[0].v < MAX_VELOCIDAD * 3.8) {
 		DATA.bl.shift();
 	}
 
-	// --
+	// -- si una bala mia dio en el blanco.. notifica la baja
+
+	var dme = DATA.cr[DATA.me];
+	for ( var d in DATA.bl) {
+		var e = DATA.bl[d];
+
+		if (e.a && e.c == DATA.me) {
+
+			for ( var cd in DATA.cr) {
+
+				var dcd = DATA.cr[cd];
+
+				if (dcd != null && dcd.e >= 0 && dcd.c == 0) {
+
+					var dx = Math.sqrt(Math.pow((e.x - dcd.x), 2) + Math.pow((e.y - dcd.y), 2)+ Math.pow((e.z - dcd.z), 2));
+
+					if (dx < DIM_NAVE + 2) {
+						console.log("Le di..! " + cd + " " + dx);
+
+						sendMessage("DDM" + JSON.stringify({
+							c : cd,
+							o : DATA.me
+						}));
+
+						// aumentar puntos
+
+						e.a = false;
+					}
+				}
+
+			}
+
+		}
+
+	}
+
+	// -- desaceleracion..!!
 
 	if (CONTROL.a == 1) {
 		car.v += 0.04 * (1 - car.v / MAX_VELOCIDAD);
@@ -178,7 +228,7 @@ function exe() {
 		car.i -= car.i * deltha * 0.5;
 	}
 
-	car.r -= deltha * car.i;
+	car.r -= deltha * car.i / 2;
 
 	// --
 
@@ -197,21 +247,21 @@ function exe() {
 		}
 	}
 
-	if (car.z < $ALTURA_NAVE) {
+	if (car.z < $ALTURA_NAVE || car.e < 0) {
 		car.z -= deltha * 2;
 	}
 
-	
 	// si se cae se muere
 	if (car.e > 0 && car.z < -15) {
 		car.e = 0;
 		$CONTROLES_ACTIVOS = false;
 		$DIE_SOUND.play();
 	}
-	
-	if(car.e <= 0){
+
+	if (car.e <= 0) {
 		car.e -= deltha;
 		console.log(car.e);
+		car.c += 1;
 	}
 
 	// si esta muerto reinicia
@@ -223,22 +273,23 @@ function exe() {
 		car.v = 1;
 		car.c = 5;
 		$CONTROLES_ACTIVOS = true;
+		$DANGER.stop();
 	}
-	
+
 	if (car.z > $ALTURA_NAVE) {
 		car.z -= 0.2;
 		if (car.z < $ALTURA_NAVE) {
 			car.z = $ALTURA_NAVE;
 		}
 	}
-	
-	if(car.c > 0){
-		car.c -= deltha/10;
-		if(car.c < 0){
+
+	if (car.c > 0) {
+		car.c -= deltha / 10;
+		if (car.c < 0) {
 			car.c = 0;
 		}
 	}
-	
+
 	// ------------------------------
 
 	var w = window.innerWidth;
@@ -248,7 +299,8 @@ function exe() {
 
 	$pcar.css("bottom", parseInt(w * (car.y + 512) / 1024 - wc) + "px");
 	$pcar.css("left", parseInt(h * (car.x + 512) / 1024 - wc) + "px");
-	$pcar.css("transform", "rotate(" + Math.round( -car.r * 180 / Math.PI) +"deg)");
+	$pcar.css("transform", "rotate(" + Math.round(-car.r * 180 / Math.PI)
+			+ "deg)");
 
 	if ($w) {
 		$w.postMessage(DATA, "*");
@@ -261,15 +313,15 @@ function exe() {
 var ws = null;
 
 function connect() {
-	
+
 	var URL = 'ws://edwinfapp.com/Wezen/srv';
 
-	if(window.location.hostname == "127.0.0.1"){
+	if (window.location.hostname == "127.0.0.1") {
 		URL = 'ws://127.0.0.1:8080/Wezen/srv';
 	}
 
 	console.log("Server: " + URL);
-	
+
 	if ('WebSocket' in window) {
 		ws = new WebSocket(URL);
 	} else if ('MozWebSocket' in window) {
@@ -285,14 +337,63 @@ function connect() {
 	ws.onmessage = function(event) {
 		var message = event.data;
 
-		// --
+		// -- Un nuevo disparo..
 
-		if (message != null && message.indexOf("DD") == 0) {
-			console.log(message.substring(2) + " disparo..!");
+		if (message != null && message.indexOf("DDD") == 0) {
+			console.log(message.substring(3) + " disparo..!");
 
-			var bb = JSON.parse(message.substring(2));
-
+			var bb = JSON.parse(message.substring(3));
+			bb.a = true;
 			DATA.bl.push(bb);
+
+			return;
+		}
+
+		if (message != null && message.indexOf("DDE") == 0) {
+			console.log(message.substring(3) + " gana estrella..!");
+
+			var bb = JSON.parse(message.substring(3));
+
+			if (bb.c == DATA.me) {
+				DATA.cr[DATA.me].p++;
+				window.setTimeout(function(){ $STAR.play(); }, 2000);
+				$DIE_SOUND.play();
+			}
+
+			return;
+		}
+
+		// -- Me dieron
+
+		if (message != null && message.indexOf("DDM") == 0) {
+			console.log(message.substring(3) + " me dieron..!");
+
+			var bb = JSON.parse(message.substring(3));
+
+			if (bb.c == DATA.me) {
+
+				console.log("me dio");
+				var dme = DATA.cr[DATA.me];
+
+				dme.e -= $ENERGIA_DISPARO;
+				dme.z += 1;
+
+				if (dme.e <= 0) {
+					$DIE_SOUND.play();
+					dme.z -= 1;
+					
+					sendMessage("DDE" + JSON.stringify({
+						c : bb.o
+					}));
+				}
+				
+				if(dme.e <= 40){
+					if(!$DANGER.playing()){
+						$DANGER.play();
+					}
+				}
+				
+			}
 
 			return;
 		}
