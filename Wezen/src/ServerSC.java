@@ -206,6 +206,8 @@ public class ServerSC {
 				c = 0, // tiempo con campo de energia
 				p = 0 // puntaje
 		;
+		
+		public String n;
 	}
 
 }

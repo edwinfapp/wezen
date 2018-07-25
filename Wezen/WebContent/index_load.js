@@ -1,10 +1,9 @@
 var $ALTURA_NAVE = 2.8;
 
 var IDCAR = 0;
+var USER_NAME = $("#user_name").val();
 
 var IFCONTROL = $("#if_control").get(0).contentWindow;
-
-var VELOCIMETRO_HT = $("#vel_in");
 
 var PIXELRATIO = 0.8;
 
@@ -22,7 +21,7 @@ CAMERA.up = new THREE.Vector3(0, 0, 1);
 var RENDERER = new THREE.WebGLRenderer();
 RENDERER.setSize(AG.width(), AG.height());
 RENDERER.setPixelRatio(window.devicePixelRatio * PIXELRATIO);
-RENDERER.setClearColor(0x000000, 1);
+RENDERER.setClearColor(0x111111, 1);
 
 RENDERER.shadowMap.enabled = true;
 RENDERER.shadowMap.type = THREE.PCFSoftShadowMap; // default
@@ -441,7 +440,8 @@ function enviarComandoDemo() {
 	var msg = {
 		a : GAME_ACELERANDO,
 		d : GAME_DIRECCION,
-		p : disparo
+		p : disparo,
+		n : USER_NAME
 	}
 
 	IFCONTROL.postMessage(msg, "*");
@@ -493,11 +493,7 @@ function receiveMessage(event) {
 
 	IDCAR = data.me;
 	CDATA = data;
-
-	// ajusta la velocidad
-	VELOCIMETRO_HT.text(parseInt(data.cr[IDCAR].v * 100));
-	
-	// VELOCIMETRO_HT.text(JSON.stringify(data.cr, null, 4));
+	CDATA.cr[IDCAR].me = true;
 
 	// ajusta las posiciones de cada carro
 

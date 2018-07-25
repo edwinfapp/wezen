@@ -150,6 +150,10 @@ function exe() {
 	for ( var d in DATA.bl) {
 		var e = DATA.bl[d];
 		e.v -= 0.07;
+		e.y_ = e.y;
+		e.x_ = e.x;
+		e.z_ = e.z;
+		
 		e.y += deltha * e.v * Math.cos(-e.r);
 		e.x += deltha * e.v * Math.sin(-e.r);
 	}
@@ -163,10 +167,12 @@ function exe() {
 	// -- si una bala mia dio en el blanco.. notifica la baja
 
 	var dme = DATA.cr[DATA.me];
+	dme.n = CONTROL.n;
+	
 	for ( var d in DATA.bl) {
 		var e = DATA.bl[d];
 
-		if (e.a && e.c == DATA.me) {
+		if (e.c == DATA.me) {
 
 			for ( var cd in DATA.cr) {
 
@@ -174,19 +180,27 @@ function exe() {
 
 				if (dcd != null && dcd.e >= 0 && dcd.c == 0) {
 
-					var dx = Math.sqrt(Math.pow((e.x - dcd.x), 2) + Math.pow((e.y - dcd.y), 2)+ Math.pow((e.z - dcd.z), 2));
+					// distancia con el punto anterior
+					var da = distancia(e.x, e.y, e.x_, e.y_);
 
-					if (dx < DIM_NAVE + 2) {
-						console.log("Le di..! " + cd + " " + dx);
+					// distancia con el punto target
+					var dp1 = distancia(e.x, e.y, dcd.x, dcd.y);
+					var dp2 = distancia(e.x_, e.y_, dcd.x, dcd.y);
 
-						sendMessage("DDM" + JSON.stringify({
-							c : cd,
-							o : DATA.me
-						}));
+					if (da > dp1 && da > dp2 ) {
 
-						// aumentar puntos
+						var dx = m_distancia(dcd.x, dcd.y, e.x, e.y, e.x_, e.y_);
 
-						e.a = false;
+						if (dx < DIM_NAVE + 2) {
+							console.log("Le di..! " + da + "," + dp1 + ", " + dp2 + " " + dx);
+
+							sendMessage("DDM" + JSON.stringify({
+								c : cd,
+								o : DATA.me,
+								d: Math.ceil(5 * (1 - dx / (DIM_NAVE + 2))) // puntos otorgados
+							}));
+
+						}
 					}
 				}
 
@@ -254,6 +268,11 @@ function exe() {
 	// si se cae se muere
 	if (car.e > 0 && car.z < -15) {
 		car.e = 0;
+		car.p -= 25;
+		if(car.p < 0){
+			car.p = 0;
+		}
+		
 		$CONTROLES_ACTIVOS = false;
 		$DIE_SOUND.play();
 	}
@@ -355,9 +374,18 @@ function connect() {
 			var bb = JSON.parse(message.substring(3));
 
 			if (bb.c == DATA.me) {
-				DATA.cr[DATA.me].p++;
-				window.setTimeout(function(){ $STAR.play(); }, 2000);
-				$DIE_SOUND.play();
+				
+				DATA.cr[DATA.me].p += 2;
+				
+				if(bb.f){
+					
+					DATA.cr[DATA.me].p += 50;
+					
+					window.setTimeout(function() {
+						$STAR.play();
+					}, 2000);
+					$DIE_SOUND.play();
+				}
 			}
 
 			return;
@@ -375,24 +403,36 @@ function connect() {
 				console.log("me dio");
 				var dme = DATA.cr[DATA.me];
 
-				dme.e -= $ENERGIA_DISPARO;
-				dme.z += 1;
-
-				if (dme.e <= 0) {
-					$DIE_SOUND.play();
-					dme.z -= 1;
-					
-					sendMessage("DDE" + JSON.stringify({
-						c : bb.o
-					}));
+				if(dme.p > 0){
+					dme.p -= 1;
 				}
 				
-				if(dme.e <= 40){
-					if(!$DANGER.playing()){
-						$DANGER.play();
+				dme.e -= bb.d;
+				dme.z += 1;
+
+				var ft = (dme.e <= 0);
+				if (ft) {
+					$DIE_SOUND.play();
+					dme.z -= 1;
+					if(dme.p > 25){
+						dme.p -= 25;
+					}else{
+						dme.p = 0;
 					}
 				}
 				
+				sendMessage("DDE" + JSON.stringify({
+					c : bb.o,
+					d : bb.d,
+					f : ft
+				}));
+
+				if (dme.e <= 40) {
+					if (!$DANGER.playing()) {
+						$DANGER.play();
+					}
+				}
+
 			}
 
 			return;
@@ -498,7 +538,8 @@ function actualizarData(mdata) {
 				i : 0,
 				e : 0,
 				c : 0,
-				p : 0
+				p : 0,
+				n : "?",
 			};
 
 		}
@@ -511,8 +552,6 @@ function actualizarData(mdata) {
 			r : mdata.cr[i].r,
 			i : mdata.cr[i].i,
 			c : mdata.cr[i].c,
-			p : mdata.cr[i].p,
-			e : mdata.cr[i].e,
 		};
 
 		var deltha = (PROMEDIOTIEMPO) / 80;
@@ -523,10 +562,39 @@ function actualizarData(mdata) {
 		npos.x += deltha * npos.v * Math.sin(angu);
 
 		$(DATA.cr[i]).stop().animate(npos, PROMEDIOTIEMPO * 1.2, "linear");
+		
+		DATA.cr[i].n = mdata.cr[i].n;
+		DATA.cr[i].e = mdata.cr[i].e;
+		DATA.cr[i].p = mdata.cr[i].p;
+		
 	}
 
 }
 
+// distancia entre doa puntos
+
+function distancia(x1, y1, x2, y2) {
+	return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
+}
+
+// distancia entre un punto y una recta
+function m_distancia(px, py, dx1, dy1, dx2, dy2) {
+
+	if (dx2 == dx1) {
+		dx2 += 0.00001;
+	}
+
+	var a = (dy2 - dy1) / (dx2 - dx1);
+	var b = -1;
+	var c = dy1 - a * dx1;
+
+	var dis = Math.abs((a * px + b * py + c) / Math.sqrt(a * a + b * b));
+
+	return dis;
+
+}
+
 $(function() {
+
 	connect();
 })
