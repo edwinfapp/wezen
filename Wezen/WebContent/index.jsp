@@ -1,3 +1,4 @@
+<%@page import="org.apache.commons.lang3.StringUtils"%>
 <html>
 <head>
 <title>Wezen</title>
@@ -14,7 +15,15 @@
 </head>
 <body ng-app="app" ng-controller="mainController">
 
-	<input type="hidden" id="user_name" value="<%= request.getParameter("name") %>"/>
+	<% String user_name = StringUtils.trimToNull(request.getParameter("name"));
+	
+		if(user_name == null){
+			user_name = "guest " + (Math.round(Math.random() * 90d) + 10);
+		}
+	%>
+
+
+	<input type="hidden" id="user_name" value="<%= user_name %>"/>
 
 	<iframe id="if_control" onload="IREADY = true;" src="control.jsp"></iframe>
 

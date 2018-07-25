@@ -160,7 +160,7 @@ function exe() {
 
 	// -- si esta ya muy lejos la bala se elimina..!!
 
-	while (DATA.bl.length > 0 && DATA.bl[0].v < MAX_VELOCIDAD * 3.8) {
+	while (DATA.bl.length > 0 && DATA.bl[0].v < MAX_VELOCIDAD * 3.5) {
 		DATA.bl.shift();
 	}
 

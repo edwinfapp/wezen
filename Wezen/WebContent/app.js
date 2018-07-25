@@ -38,7 +38,7 @@ app.controller('mainController', function mainController($scope, $interval) {
 				$("#energia").css("background-color", "rgba(" + Math.round( 255 * (100 - $scope.energia)/100 ) + ",0,0,0.8)");
 			}
 		}
-	}, 100);
+	}, 50);
 
 });
 
