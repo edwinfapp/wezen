@@ -40,6 +40,10 @@ var DIM_PISO = 1024;
 var DIM_NAVE = 4;
 var $ALTURA_NAVE = 3.5;
 var $ENERGIA_DISPARO = 5;
+var MAX_VELOCIDAD = 12;
+var MAX_VELOCIDAD_BALA = 80;
+var MIN_VELOCIDAD = 1;
+
 
 var $w = null;
 
@@ -84,7 +88,6 @@ var CONTROL = {
 	p : false
 }
 
-var MAX_VELOCIDAD = 18;
 
 var ltime = Date.now();
 
@@ -131,7 +134,7 @@ function exe() {
 			y : car.y,
 			z : car.z,
 			r : car.r,
-			v : MAX_VELOCIDAD * 4,
+			v : MAX_VELOCIDAD_BALA,
 			c : DATA.me,
 			a : true
 		}
@@ -160,7 +163,7 @@ function exe() {
 
 	// -- si esta ya muy lejos la bala se elimina..!!
 
-	while (DATA.bl.length > 0 && DATA.bl[0].v < MAX_VELOCIDAD * 3.5) {
+	while (DATA.bl.length > 0 && DATA.bl[0].v < MAX_VELOCIDAD_BALA * 0.8) {
 		DATA.bl.shift();
 	}
 
@@ -213,14 +216,14 @@ function exe() {
 	// -- desaceleracion..!!
 
 	if (CONTROL.a == 1) {
-		car.v += 0.04 * (1 - car.v / MAX_VELOCIDAD);
+		car.v += 0.05 * (1 - car.v / MAX_VELOCIDAD);
 	}
 
-	if (CONTROL.a == -1 && car.v > 1) {
+	if (CONTROL.a == -1 && car.v > MIN_VELOCIDAD) {
 		car.v -= 0.08;
 	}
 
-	if (CONTROL.a == 0 && car.v > 1) {
+	if (CONTROL.a == 0 && car.v > MIN_VELOCIDAD) {
 		car.v -= 0.01;
 	}
 
@@ -242,7 +245,7 @@ function exe() {
 		car.i -= car.i * deltha * 0.5;
 	}
 
-	car.r -= deltha * car.i / 2;
+	car.r -= deltha * (car.i / 2) * (2 - car.v / MAX_VELOCIDAD);
 
 	// --
 
@@ -289,7 +292,7 @@ function exe() {
 		car.z = $ALTURA_NAVE + 30;
 		car.x = 0;
 		car.y = 0;
-		car.v = 1;
+		car.v = MIN_VELOCIDAD;
 		car.c = 5;
 		$CONTROLES_ACTIVOS = true;
 		$DANGER.stop();
@@ -509,7 +512,7 @@ function actualizarData(mdata) {
 				x : 0,
 				y : 0,
 				z : $ALTURA_NAVE,
-				v : 1,
+				v : MIN_VELOCIDAD,
 				r : 0,
 				i : 0,
 				e : 100,
@@ -533,7 +536,7 @@ function actualizarData(mdata) {
 				x : 0,
 				y : 0,
 				z : $ALTURA_NAVE,
-				v : 1,
+				v : MIN_VELOCIDAD,
 				r : 0,
 				i : 0,
 				e : 0,

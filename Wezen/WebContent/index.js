@@ -40,7 +40,7 @@ $(function() {
 				GEONAVE.rotation.x += Math.PI / 2;
 				GEONAVE.rotation.y -= Math.PI / 2;
 
-				$.getScript("index_load.js");
+				$.getScript("index_load.js?v1");
 
 			});
 

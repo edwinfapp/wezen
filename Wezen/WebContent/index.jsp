@@ -10,10 +10,12 @@
     <script src="js/three.min.js"></script>
 	<script src="js/jquery-3.3.1.min.js"></script>
 	<script src="js/angular.min.js"></script>
-	<script src="index.js"></script>
+	<script src="index.js?v1"></script>
 
 </head>
 <body ng-app="app" ng-controller="mainController">
+
+	<div id="logo_game"></div>
 
 	<% String user_name = StringUtils.trimToNull(request.getParameter("name"));
 	
@@ -25,7 +27,7 @@
 
 	<input type="hidden" id="user_name" value="<%= user_name %>"/>
 
-	<iframe id="if_control" onload="IREADY = true;" src="control.jsp"></iframe>
+	<iframe id="if_control" onload="IREADY = true;" src="control.jsp?v1"></iframe>
 
 	<div id="area_game"></div>
 	

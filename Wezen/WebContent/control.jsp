@@ -10,6 +10,6 @@
 <body>
 	<div id="pcar"></div>
 
-	<script src="control.js"></script>
+	<script src="control.js?v1"></script>
 </body>
 </html>
