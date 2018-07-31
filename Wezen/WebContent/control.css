@@ -8,12 +8,19 @@ html, body {
 	overflow: hidden;
 }
 
-#pcar {
+.pcar{
 	display: block;
 	position: absolute;
 	width: 20px;
 	height: 20px;
-	background-image: url("images/flecha.png");
+	background-image: url("images/flecha2.png");
 	background-repeat: no-repeat;
 	background-size: 100% 100%;
+	left: -100px;
+	bottom: -100px;
+}
+
+.asme{
+	background-image: url("images/flecha.png");
+	z-index: 10;
 }

@@ -58,7 +58,6 @@ window.addEventListener("message", receiveMessage, false);
 // --------------------
 
 var $frm = $("#frm");
-var $pcar = $("#pcar");
 
 var TIEMPOEXE = 16;
 
@@ -317,12 +316,36 @@ function exe() {
 	var w = window.innerWidth;
 	var h = window.innerHeight;
 
-	var wc = $pcar.width() / 2;
+	
+	for(var i=0; i<DATA.cr.length; i++){
+		
+		var $pcari = $("#pcar" + i);
+		
+		if( i == DATA.me){
+			$pcari.addClass("asme");
+		}
+		
+		var wc = $pcari.width() / 2;
 
-	$pcar.css("bottom", parseInt(w * (car.y + 512) / 1024 - wc) + "px");
-	$pcar.css("left", parseInt(h * (car.x + 512) / 1024 - wc) + "px");
-	$pcar.css("transform", "rotate(" + Math.round(-car.r * 180 / Math.PI)
-			+ "deg)");
+		var pcar = DATA.cr[i];
+
+		var lx = -100;
+		var ly = -100;
+		var lr = 0;
+		
+		if(pcar != null){
+			lx = parseInt(h * (pcar.x + 512) / 1024 - wc);
+			ly = parseInt(w * (pcar.y + 512) / 1024 - wc);
+			lr = Math.round(-pcar.r * 180 / Math.PI);
+		}
+	
+		
+		$pcari.css("bottom", ly + "px");
+		$pcari.css("left", lx + "px");
+		$pcari.css("transform", "rotate(" + lr + "deg)");
+
+	}
+	
 
 	if ($w) {
 		$w.postMessage(DATA, "*");
@@ -564,8 +587,7 @@ function actualizarData(mdata) {
 		npos.y += deltha * npos.v * Math.cos(angu);
 		npos.x += deltha * npos.v * Math.sin(angu);
 
-		$(DATA.cr[i]).stop().animate(npos, PROMEDIOTIEMPO * 1.2, "linear");
-		
+		$(DATA.cr[i]).stop().animate(npos, PROMEDIOTIEMPO * 1.4, "linear");		
 		DATA.cr[i].n = mdata.cr[i].n;
 		DATA.cr[i].e = mdata.cr[i].e;
 		DATA.cr[i].p = mdata.cr[i].p;
