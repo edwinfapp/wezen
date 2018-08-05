@@ -15,6 +15,7 @@ console.log(AG.width() + ", " + AG.height());
 
 var SCENE = new THREE.Scene();
 
+var CAMERA_DIS = 6.5;
 var CAMERA = new THREE.PerspectiveCamera(75, AG.width() / AG.height(), 0.1, 2000);
 CAMERA.up = new THREE.Vector3(0, 0, 1);
 
@@ -359,9 +360,17 @@ var animate = function() {
 		if (CDATA) {
 			dis = CDATA.cr[IDCAR].v / 2 + 6;
 		}
+		
+		if(CAMERA_DIS + 0.1 < dis) CAMERA_DIS += 0.1;
+		if(CAMERA_DIS - 0.1 > dis) CAMERA_DIS -= 0.1;
 	
-		CAMERA.position.y = cube.position.y - dis * Math.cos(angu);
-		CAMERA.position.x = cube.position.x - dis * Math.sin(angu);
+		var destino = { y: cube.position.y - CAMERA_DIS * Math.cos(angu), x : cube.position.x - CAMERA_DIS * Math.sin(angu) };
+		
+		var dsc = distancia(destino.x, destino.y, CAMERA.position.x, CAMERA.position.y);
+		
+		CAMERA.position.y = destino.y;
+		CAMERA.position.x = destino.x;
+		
 		CAMERA.position.z = 10;
 	
 		CAMERA_LOOKAT.x = cube.position.x + 15 * Math.sin(angu);
@@ -397,25 +406,52 @@ $(window).resize(function() {
 // ------ CONTROLES
 
 var PRESSKEY = {
-	"C37" : false,
-	"C38" : false,
-	"C39" : false,
-	"C40" : false,
-	"C88" : false,
+	"C37" : false, // flecha izquierda
+	"C38" : false, // flecha arriba
+	"C39" : false, // flecha derecha
+	"C40" : false, // flecha atras
+	"C90" : false, // tecla Z
+	"C88" : false, // tecla X
+	"C67" : false, // tecla C
+	"C65" : false, // tecla A
+	"C83" : false, // tecla S
+	"C68" : false, // tecla D
+	"C70" : false, // tecla F
 };
 
 var GAME_VELOCIDAD = 0; // velocidad del carro
 var GAME_ACELERANDO = 0; // determina si esta acelerando ( 0 / 1)
 var GAME_DIRECCION = 0; // determina la direccion a la cual se dirige
 var GAME_DISPARO = 0; // determina si esta disparando.
+var GAME_IMPULSO = 0; // determina si hace impulso.
+var GAME_DEFENSA = 0; // determina si hace defensa.
+var GAME_ROTACION = 0; // determina si hace rotacion.
+var GAME_INVISIBLE = 0; // determina si se hace invisible.
 
 function enviarComandoDemo() {
 
+	var cmd = KEYAR.join('');
 	var disparo = !PRESSKEY.C88 && GAME_DISPARO == 1;
+	var invisible = !PRESSKEY.C90 && GAME_INVISIBLE == 1;
+	
+	var comando_impulso = cmd.endsWith("</C38>[F]<C38>[F]</C38>[F]<C38>");
+	var comando_defensa = cmd.endsWith("[F]<C40>[F]</C40>[F]<C40>");
+	var comando_rotacion_der = cmd.endsWith("[S]<C39>[F]</C39>[F]<C39>[F]</C39>");
+	var comando_rotacion_izq = cmd.endsWith("[S]<C37>[F]</C37>[F]<C37>[F]</C37>");
+	
+	var impulso = comando_impulso && GAME_IMPULSO == 0;
+	var defensa = comando_defensa && GAME_DEFENSA == 0;
+	var rotacion_der = comando_rotacion_der && GAME_ROTACION == 0;
+	var rotacion_izq = comando_rotacion_izq && GAME_ROTACION == 0;
+	
 	
 	GAME_ACELERANDO = 0;
 	GAME_DIRECCION = 0;
 	GAME_DISPARO = 0;
+	GAME_IMPULSO = 0;
+	GAME_DEFENSA = 0;
+	GAME_INVISIBLE = 0;
+	GAME_ROTACION = 0;
 
 	if (PRESSKEY.C38) {
 		GAME_ACELERANDO = 1;
@@ -437,32 +473,93 @@ function enviarComandoDemo() {
 		GAME_DISPARO = 1;
 	}
 	
+	if (PRESSKEY.C90) {
+		GAME_INVISIBLE = 1;
+	}
+	
+	if(comando_impulso){
+		GAME_IMPULSO = 1;
+	}
+	
+	if(comando_defensa){
+		GAME_DEFENSA = 1;
+	}
+	
+	if(comando_rotacion_izq){
+		GAME_ROTACION = 1;
+	}
+	
+	if(comando_rotacion_der){
+		GAME_ROTACION = 1;
+	}
+	
+	var rotacionnave = ((comando_rotacion_der?-1:0) + (comando_rotacion_izq?1:0));
+	
 	var msg = {
 		a : GAME_ACELERANDO,
 		d : GAME_DIRECCION,
 		p : disparo,
-		n : USER_NAME
+		n : USER_NAME,
+		imp : impulso,
+		inv : invisible,
+		def : defensa,
+		rot : rotacionnave
 	}
 
 	IFCONTROL.postMessage(msg, "*");
 }
 
-var ULTIMO_COMANDO = "";
+var KEYAR = [];
+var PRESSKEYTIME = {};
 
 $(document).keydown(function(event) {
 
-	if (PRESSKEY["C" + event.which] !== undefined) {
-		PRESSKEY["C" + event.which] = true;
+	var k = "C" + event.which;
+	
+	if (PRESSKEY[k] !== undefined) {
+		
+		if(KEYAR.length > 0 && KEYAR[KEYAR.length - 1] == ("<" + k + ">") ){
+			return;
+		}
+		
+		if(PRESSKEYTIME[k] !== undefined){
+			KEYAR.push("[" + ((Date.now() - PRESSKEYTIME[k])>300?"S":"F")  + "]");
+		}
+
+		KEYAR.push("<" + k + ">");
+		
+		while(KEYAR.length > 8){
+			KEYAR.shift();
+		}
+		
+		PRESSKEYTIME[k] = Date.now();
+		PRESSKEY[k] = true;
 		enviarComandoDemo();
+		
+		// console.log( KEYAR.join('') );
 	}
 
 });
 
 $(document).keyup(function(event) {
 	
-	if (PRESSKEY["C" + event.which] !== undefined) {
-		PRESSKEY["C" + event.which] = false;
+	var k = "C" + event.which;
+	
+	if (PRESSKEY[k] !== undefined) {
+		
+		KEYAR.push("[" + ((Date.now() - PRESSKEYTIME[k])>300?"S":"F")  + "]");
+		KEYAR.push("</" + k + ">");
+		
+		while(KEYAR.length > 8){
+			KEYAR.shift();
+		}
+		
+		PRESSKEYTIME[k] = Date.now();
+		
+		PRESSKEY[k] = false;
 		enviarComandoDemo();
+		
+		// console.log( KEYAR.join('') );
 	}
 });
 
@@ -553,3 +650,7 @@ function receiveMessage(event) {
 }
 
 window.addEventListener("message", receiveMessage, false);
+
+function distancia(x1, y1, x2, y2) {
+	return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
+}

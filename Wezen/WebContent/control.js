@@ -84,10 +84,15 @@ var DATA = {
 var CONTROL = {
 	a : 0, // acelerenado
 	d : 0, // direccion
-	p : false
+	p : false,
+	n : null,
+	imp : false,
+	inv : false,
+	def : false,
+	rot : 0
 }
 
-
+var ROT_DESTINO = null;
 var ltime = Date.now();
 
 function exe() {
@@ -199,7 +204,8 @@ function exe() {
 							sendMessage("DDM" + JSON.stringify({
 								c : cd,
 								o : DATA.me,
-								d: Math.ceil(5 * (1 - dx / (DIM_NAVE + 2))) // puntos otorgados
+								d: Math.ceil(5 * (1 - dx / (DIM_NAVE + 2))) // puntos
+																			// otorgados
 							}));
 
 						}
@@ -210,6 +216,25 @@ function exe() {
 
 		}
 
+	}
+	
+	// adiciona impulso
+	
+	if (CONTROL.imp == 1 && car.v <= MAX_VELOCIDAD) {
+		car.v = MAX_VELOCIDAD * 1.5;
+	}
+	
+	// adiciona el campo de energia
+	if (CONTROL.def == 1 && car.c <= 0) {
+		car.c = 5;
+	}
+	
+	// adiciona giro de 180
+	if (CONTROL.rot != 0 && ROT_DESTINO == null ) {
+		
+		CONTROL.d = 0;
+		ROT_DESTINO = car.r + CONTROL.rot * Math.PI;
+		// car.v = car.v * 0.5;
 	}
 
 	// -- desaceleracion..!!
@@ -246,10 +271,23 @@ function exe() {
 
 	car.r -= deltha * (car.i / 2) * (2 - car.v / MAX_VELOCIDAD);
 
+	// si tiene que rotar..
+	
+	if(ROT_DESTINO != null){
+		
+		if(ROT_DESTINO > car.r - 0.1 ) car.r += 0.1;
+		if(ROT_DESTINO < car.r + 0.1 ) car.r -= 0.1;
+		
+		
+		if(Math.abs(ROT_DESTINO - car.r) < 0.1){
+			ROT_DESTINO = null;
+		}
+	}
+	
 	// --
 
 	angu = -car.r;
-
+	
 	car.y += deltha * car.v * Math.cos(angu);
 	car.x += deltha * car.v * Math.sin(angu);
 
