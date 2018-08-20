@@ -396,11 +396,15 @@ function exe() {
 var ws = null;
 
 function connect() {
-
+	
 	var URL = 'ws://edwinfapp.com/Wezen/srv';
 
 	if (window.location.hostname == "127.0.0.1") {
 		URL = 'ws://127.0.0.1:8080/Wezen/srv';
+	}
+	
+	if (window.location.hostname == "192.168.1.107") {
+		URL = 'ws://192.168.1.107:8080/Wezen/srv';
 	}
 
 	console.log("Server: " + URL);

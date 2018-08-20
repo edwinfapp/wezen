@@ -60,7 +60,7 @@
             "blending": "NormalBlending",
             "specularCoef": 50,
             "DbgName": "Standard",
-            "mapDiffuse": "30741047_10155601322843412_422522789338021888_o.jpg",
+            "mapDiffuse": "ship.jpg",
             "colorEmissive": [0,0,0],
             "visible": true,
             "wireframe": false,
@@ -83,9 +83,9 @@
         "type": "Object"
     },
     "images": [{
-        "url": "30741047_10155601322843412_422522789338021888_o.jpg",
+        "url": "ship.jpg",
         "uuid": "849DC2EE-E572-36F2-AAFF-8ABC41D12B68",
-        "name": "30741047_10155601322843412_422522789338021888_o.jpg"
+        "name": "ship.jpg"
     }],
     "textures": [{
         "anisotropy": 1,

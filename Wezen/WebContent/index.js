@@ -1,51 +1,30 @@
-// ------------------------------
 
-var IREADY = false;
-
-
-var GEONAVE = null;
-var GEOTOWER = null;
-var GEOSTATION = null
-
-$(function() {
-
-	new THREE.ObjectLoader().load('model/ship.json', function(geo) {
-
-		GEONAVE = geo;
-
-		new THREE.ObjectLoader().load('model/tower.json', function(geo) {
-
-			GEOTOWER = geo;
-
-			GEOTOWER.scale.set(25, 25, 25);
-
-			GEOTOWER.rotation.x += Math.PI / 2;
-
-			GEOTOWER.position.z = -20;
-
-			new THREE.ObjectLoader().load('model/station.json', function(geo) {
-
-				GEOSTATION = geo;
-
-				GEOSTATION.scale.set(3, 3, 3);
-
-				GEOSTATION.position.z = 60;
-
-				// --
-
-				GEONAVE.scale.set(140, 140, 140);
-
-				// GEONAVE.scale.set(1,1,1);
-
-				GEONAVE.rotation.x += Math.PI / 2;
-				GEONAVE.rotation.y -= Math.PI / 2;
-
-				$.getScript("index_load.js?v1");
-
-			});
-
-		});
-
+function preload(url) {
+	$.ajax({
+		async : false,
+		type : "GET",
+		url : url
 	});
+}
 
-});
+
+// -------------
+
+preload("/Wezen/model/ship.json");
+preload("/Wezen/model/station.json");
+preload("/Wezen/model/tower.json");
+
+preload("/Wezen/model/ship.jpg");
+preload("/Wezen/model/station.jpg");
+preload("/Wezen/model/tower.jpg");
+
+preload("/Wezen/images/car.png");
+preload("/Wezen/images/energia.jpg");
+preload("/Wezen/images/fuego.jpg");
+preload("/Wezen/images/logo.png");
+preload("/Wezen/images/flecha.png");
+preload("/Wezen/images/flecha2.png");
+preload("/Wezen/images/lava.png");
+
+location.href = "/Wezen/game.jsp?name=Edwin"
+

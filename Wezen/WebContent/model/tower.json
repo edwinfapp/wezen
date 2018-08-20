@@ -7,7 +7,7 @@
         "repeat": [1,1],
         "anisotropy": 1,
         "magFilter": 1006,
-        "name": "repaired_Roman_stone_wall_jpg",
+        "name": "tower_jpg",
         "mapping": 300
     }],
     "materials": [{
@@ -27,8 +27,8 @@
     }],
     "images": [{
         "uuid": "32C0A626-7C55-3C3E-A4F5-7E0CE5C58D5D",
-        "url": "repaired_Roman_stone_wall.jpg",
-        "name": "repaired_Roman_stone_wall.jpg"
+        "url": "tower.jpg",
+        "name": "tower.jpg"
     }],
     "object": {
         "uuid": "3AC9ECB7-39FC-445E-B631-4BF63D3C5D0B",
@@ -65,7 +65,7 @@
             "DbgName": "Standard",
             "colorEmissive": [0,0,0],
             "depthWrite": true,
-            "mapDiffuse": "repaired_Roman_stone_wall.jpg",
+            "mapDiffuse": "tower.jpg",
             "blending": "NormalBlending",
             "colorDiffuse": [0.690196,0.690196,0.690196],
             "mapDiffuseWrap": ["RepeatWrapping","RepeatWrapping"],
