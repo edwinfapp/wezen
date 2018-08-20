@@ -17,6 +17,80 @@ pre {
 	font-size: 8px;
 }
 
+iframe{
+	border: 0px;
+	background-color: white;	
+}
+
+.bd_usuario{
+	/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#000000+0,7db9e8+100 */
+	background: #000000; /* Old browsers */
+	background: -moz-linear-gradient(left, #000000 0%, #7db9e8 100%); /* FF3.6-15 */
+	background: -webkit-linear-gradient(left, #000000 0%,#7db9e8 100%); /* Chrome10-25,Safari5.1-6 */
+	background: linear-gradient(to right, #000000 0%,#7db9e8 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#7db9e8',GradientType=1 ); /* IE6-9 */
+}
+
+.bd_usuario .content{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-image: url("images/logo.png");
+	background-repeat: no-repeat;
+	background-size: auto 20%;
+	background-position: 30px center;
+}
+
+#area_usuario{
+	position: absolute;
+	text-align: center;
+	width: 50%;
+	height: 100%;
+	top: 0px;
+	right: 0px;
+	padding: 200px 50px 0px;
+}
+
+#area_usuario input{
+	text-align: center;
+	background-color: white;
+	border: none;
+	font-size: 40px;
+	font-weight: 300;
+	color: black;
+	padding: 20px;
+	display: block;
+	width: 100%;
+	text-transform: uppercase;
+}
+
+#area_usuario button{
+	text-align: center;
+	background-color: #162028;
+	border: none;
+	font-size: 40px;
+	font-weight: 400;
+	color: white;
+	padding: 20px;
+	display: block;
+	width: 100%;
+	text-transform: uppercase;
+	margin: 20px 0px;
+}
+
+.loader{
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	width: 50%;
+	height: 100%;
+	background-image: url("images/load.gif");
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: 200px auto;
+}
+
+
 canvas {
 	width: 100%;
 	height: 100%;
