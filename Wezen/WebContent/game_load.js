@@ -1,3 +1,5 @@
+// -----
+
 var $ALTURA_NAVE = 2.8;
 
 var IDCAR = 0;
@@ -654,3 +656,9 @@ window.addEventListener("message", receiveMessage, false);
 function distancia(x1, y1, x2, y2) {
 	return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
 }
+
+// --
+
+window.setTimeout(function(){
+	$(".ini_load").fadeOut(800);
+}, 800);

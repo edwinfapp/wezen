@@ -15,6 +15,7 @@
 </head>
 <body ng-app="app" ng-controller="mainController">
 
+	<div class="ini_load"></div>
 	<div id="logo_game"></div>
 
 	<% String user_name = StringUtils.trimToNull(request.getParameter("name"));

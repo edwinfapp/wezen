@@ -427,7 +427,7 @@ function connect() {
 		// -- Un nuevo disparo..
 
 		if (message != null && message.indexOf("DDD") == 0) {
-			console.log(message.substring(3) + " disparo..!");
+			//console.log(message.substring(3) + " disparo..!");
 
 			var bb = JSON.parse(message.substring(3));
 			bb.a = true;
@@ -518,8 +518,8 @@ function connect() {
 
 	};
 	ws.onclose = function() {
-		alert('Desconectado!');
-		ws = null;
+		alert('Lo sentimos, se ha desconectado del servidor!');
+		window.top.location = "/Wezen"
 	};
 	ws.onerror = function(event) {
 		console.log('Se produjo un error! ');
