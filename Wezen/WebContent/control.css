@@ -24,3 +24,15 @@ html, body {
 	background-image: url("images/flecha.png");
 	z-index: 10;
 }
+
+.disparo_df{
+	position: absolute;
+	left: 5px;
+	top: 0%;
+	width: 20px;
+	height: 20px;
+	background-image: url("images/ok.png");
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: center center;
+}

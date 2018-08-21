@@ -201,6 +201,8 @@ function exe() {
 						if (dx < DIM_NAVE + 2) {
 							console.log("Le di..! " + da + "," + dp1 + ", " + dp2 + " " + dx);
 
+							marcarDisparo();
+							
 							sendMessage("DDM" + JSON.stringify({
 								c : cd,
 								o : DATA.me,
@@ -427,7 +429,7 @@ function connect() {
 		// -- Un nuevo disparo..
 
 		if (message != null && message.indexOf("DDD") == 0) {
-			//console.log(message.substring(3) + " disparo..!");
+			// console.log(message.substring(3) + " disparo..!");
 
 			var bb = JSON.parse(message.substring(3));
 			bb.a = true;
@@ -659,6 +661,11 @@ function m_distancia(px, py, dx1, dy1, dx2, dy2) {
 
 	return dis;
 
+}
+
+function marcarDisparo(){
+	$( "<div class='disparo_df'></div>" ).appendTo( "body" ) //
+	.animate({ top:"100%" }, 600, "linear", function() { $(this).remove(); } );
 }
 
 $(function() {
