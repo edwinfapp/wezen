@@ -1,3 +1,13 @@
+var $SPEED = new Howl({
+	src : [ 'sound/speed.mp3' ],
+	volume : 1
+});
+
+var $DEFENSA = new Howl({
+	src : [ 'sound/defensa.mp3' ],
+	volume : 0.5
+});
+
 // -----
 
 var $ALTURA_NAVE = 2.8;
@@ -430,22 +440,68 @@ var GAME_DEFENSA = 0; // determina si hace defensa.
 var GAME_ROTACION = 0; // determina si hace rotacion.
 var GAME_INVISIBLE = 0; // determina si se hace invisible.
 
+var ULTIMO_DISPARO = 0;
+var ULTIMO_DEFENSA = 0;
+var ULTIMO_IMPULSO = 0;
+
+var TIEMPO_REPETIR_IMPULSO = 20000;
+var TIEMPO_REPETIR_DEFENSA = 30000;
+
 function enviarComandoDemo() {
 
 	var cmd = KEYAR.join('');
 	var disparo = !PRESSKEY.C88 && GAME_DISPARO == 1;
 	var invisible = !PRESSKEY.C90 && GAME_INVISIBLE == 1;
 	
-	var comando_impulso = cmd.endsWith("</C38>[F]<C38>[F]</C38>[F]<C38>");
-	var comando_defensa = cmd.endsWith("[F]<C40>[F]</C40>[F]<C40>");
-	var comando_rotacion_der = false; //cmd.endsWith("[S]<C39>[F]</C39>[F]<C39>[F]</C39>");
-	var comando_rotacion_izq = false; //cmd.endsWith("[S]<C37>[F]</C37>[F]<C37>[F]</C37>");
+	var comando_impulso = cmd.endsWith("</C38>[F]<C38>[F]</C38>[F]<C38>") || PRESSKEY.C90;
+	var comando_defensa = cmd.endsWith("[F]<C40>[F]</C40>[F]<C40>") || PRESSKEY.C67;
+	var comando_rotacion_der = false; // cmd.endsWith("[S]<C39>[F]</C39>[F]<C39>[F]</C39>");
+	var comando_rotacion_izq = false; // cmd.endsWith("[S]<C37>[F]</C37>[F]<C37>[F]</C37>");
 	
 	var impulso = comando_impulso && GAME_IMPULSO == 0;
 	var defensa = comando_defensa && GAME_DEFENSA == 0;
 	var rotacion_der = comando_rotacion_der && GAME_ROTACION == 0;
 	var rotacion_izq = comando_rotacion_izq && GAME_ROTACION == 0;
 	
+	var ya = Date.now();
+	
+	if(disparo){
+		$(".btn_disparo").fadeTo(100, 0.2);
+		
+		window.setTimeout(function(){
+			$(".btn_disparo").fadeTo(10, 1);
+		}, 100 );
+	}
+	
+	// valida y anima que pueda hacer impulso
+	if(impulso && ya - TIEMPO_REPETIR_IMPULSO > ULTIMO_IMPULSO){
+		ULTIMO_IMPULSO = ya;
+		$(".btn_impulso").fadeTo(400, 0.2);
+		
+		$SPEED.play();
+		
+		window.setTimeout(function(){
+			$(".btn_impulso").fadeTo(800, 1);
+		}, TIEMPO_REPETIR_IMPULSO - 800 );
+		
+	}else{
+		impulso = false;
+	}
+	
+	// valida y anima que pueda hacer defensa
+	if(defensa && ya - TIEMPO_REPETIR_DEFENSA > ULTIMO_DEFENSA){
+		ULTIMO_DEFENSA = ya;
+		$(".btn_defensa").fadeTo(400, 0.2);
+
+		$DEFENSA.play();
+		
+		window.setTimeout(function(){
+			$(".btn_defensa").fadeTo(800, 1);
+		}, TIEMPO_REPETIR_DEFENSA - 800 );
+		
+	}else{
+		defensa = false;
+	}
 	
 	GAME_ACELERANDO = 0;
 	GAME_DIRECCION = 0;
@@ -487,16 +543,6 @@ function enviarComandoDemo() {
 		GAME_DEFENSA = 1;
 	}
 	
-	if(comando_rotacion_izq){
-		GAME_ROTACION = 1;
-	}
-	
-	if(comando_rotacion_der){
-		GAME_ROTACION = 1;
-	}
-	
-	var rotacionnave = ((comando_rotacion_der?-1:0) + (comando_rotacion_izq?1:0));
-	
 	var msg = {
 		a : GAME_ACELERANDO,
 		d : GAME_DIRECCION,
@@ -505,7 +551,7 @@ function enviarComandoDemo() {
 		imp : impulso,
 		inv : invisible,
 		def : defensa,
-		rot : rotacionnave
+		rot : 0, // se desactiva
 	}
 
 	IFCONTROL.postMessage(msg, "*");

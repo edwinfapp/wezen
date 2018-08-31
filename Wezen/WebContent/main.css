@@ -24,7 +24,7 @@ iframe{
 
 .ini_load{
 	background: black;
-	position: relative;
+	position: absolute;
 	top: 0px;
 	left: 0px;
 	width: 100%;
@@ -59,7 +59,10 @@ iframe{
 	height: 100%;
 	top: 0px;
 	right: 0px;
-	padding: 200px 50px 0px;
+	padding: 0px;
+	display: flex;
+  	flex-direction: column;
+  	padding: 0px 20px;
 }
 
 #area_usuario input{
@@ -174,8 +177,50 @@ canvas {
 	transition: background-color 1000ms linear;
 }
 
+#poderes {
+	width: 100px;
+	height: 200px;
+	position: absolute;
+	bottom: 20px;
+	left: 225px;
+	z-index: 10;
+	background-color: rgba(0, 0, 0, 0.8);
+	color: #FFF;
+	padding: 10px;
+	font-weight: 100;
+	font-style: normal;
+	font-size: 28px;
+	border: 1px solid #333;
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+#poderes button{
+	display: block;
+	width: 100%;
+	height: 50px;
+	background-color: transparent;
+	border: none;
+	margin: 7px 0px;
+	background-size: auto 90%;
+	background-repeat: no-repeat;
+	background-position: center center;
+}
+
+.btn_disparo{
+	background-image: url("images/btn/disparo.fw.png");
+}
+
+.btn_defensa{
+	background-image: url("images/btn/defensa.fw.png");
+}
+
+.btn_impulso{
+	background-image: url("images/btn/impulso.fw.png");
+}
+
 #resultados {
-	width: 200px;
+	width: 255px;
 	min-height: 50px;
 	position: absolute;
 	bottom: 20px;

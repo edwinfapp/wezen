@@ -15,8 +15,12 @@
 		<div class="loader"></div>
 	
 		<form action="game.jsp" id="area_usuario" style="display:none">
-			<input type="text" id="username" name="name" autocomplete="off" value="" placeholder="user name">
-			<button type="submit">Start</button>
+			<div style="flex-grow: 1"></div>
+			<div style="height: 200px">
+				<input type="text" id="username" name="name" autocomplete="off" value="" placeholder="user name">
+				<button type="submit">Start</button>
+			</div>
+			<div style="flex-grow: 1"></div>
 		</form>
 	</div>
 

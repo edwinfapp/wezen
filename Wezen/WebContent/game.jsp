@@ -10,6 +10,7 @@
     <script src="js/three.min.js"></script>
 	<script src="js/jquery-3.3.1.min.js"></script>
 	<script src="js/angular.min.js"></script>
+	<script src="js/howler.min.js"></script>
 	<script src="game.js?v1"></script>
 
 </head>
@@ -25,7 +26,6 @@
 		}
 	%>
 
-
 	<input type="hidden" id="user_name" value="<%= user_name %>"/>
 
 	<iframe id="if_control" onload="IREADY = true;" src="control.jsp?v1"></iframe>
@@ -33,6 +33,12 @@
 	<div id="area_game"></div>
 	
 	<div id="energia">{{energia}}%</div>
+	
+	<div id="poderes">
+		<button class="btn_impulso"></button>
+		<button class="btn_disparo"></button>
+		<button class="btn_defensa"></button>
+	</div>
 	
 	<div id="resultados">
 	
