@@ -49,7 +49,7 @@
 	
 	</div>
 	
-	<div ng-repeat="reg in cr" class="c_titulo" style="left: {{ reg.ang }}px" ng-if="reg.pt != null">
+	<div ng-repeat="reg in cr" class="c_titulo" style="top: {{ titop }}px; left: {{ reg.ang }}px" ng-if="reg.pt != null">
 		{{ reg.n }}<br>{{ reg.ang }}
 	</div>
 	

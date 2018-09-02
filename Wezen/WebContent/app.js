@@ -36,6 +36,8 @@ app.controller('mainController', function mainController($scope, $interval) {
 			var x0 = cube.position.x;
 			var y0 = cube.position.y;
 			
+			$scope.titop = parseInt(WINH / 4);
+			
 			$scope.cr.forEach(function(elem){
 				
 				var x1 = x0 + Math.cos(angu);

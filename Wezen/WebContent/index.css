@@ -1,0 +1,9 @@
+@media (max-width: 1000px) {
+  body{
+	background-color: red;  
+  }
+  
+  iframe {
+    display: none;
+  }
+}

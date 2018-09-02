@@ -185,7 +185,7 @@ function exe() {
 
 				var dcd = DATA.cr[cd];
 
-				if (dcd != null && dcd.e >= 0 && dcd.c == 0) {
+				if (dcd != null && dcd.e >= 0 && dcd.c <= 0.1) {
 
 					// distancia con el punto anterior
 					var da = distancia(e.x, e.y, e.x_, e.y_);
@@ -310,7 +310,7 @@ function exe() {
 	// si se cae se muere
 	if (car.e > 0 && car.z < -15) {
 		car.e = 0;
-		car.p -= 25;
+		car.p -= 50;
 		if(car.p < 0){
 			car.p = 0;
 		}
